@@ -1,0 +1,18 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_OOP_INHERITANCE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_OOP_INHERITANCE.
+
+DATA : o_super type REF TO zcl_p_super,
+      o_sub type REF TO zcl_p_sub.
+
+CREATE OBJECT : o_super, o_sub.
+
+o_super->get_mileage( ).
+o_sub->get_mileage( ).
+o_sub->get_seats( ).
+
+o_super = o_sub.
+o_sub ?= o_super.

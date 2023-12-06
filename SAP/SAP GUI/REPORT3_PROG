@@ -1,0 +1,45 @@
+*&---------------------------------------------------------------------*
+*& Report ZREPORT3_PROGRAM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZREPORT3_PROGRAM.
+
+
+
+TYPES : BEGIN OF ty_marc,
+   matnr TYPE marc-matnr,
+  werks TYPE marc-werks,
+  END OF ty_marc.
+
+  TYPES : BEGIN OF ty_t001w,
+         name1 TYPE t001w-name1,
+         werks TYPE t001w-werks,
+    END OF ty_t001w.
+
+  PARAMETERS p_matnr TYPE marc-matnr.
+
+  DATA : it_marc TYPE TABLE OF ty_marc,
+        wa_marc LIKE LINE OF it_marc,
+        it_t001w TYPE TABLE OF ty_t001w,
+        wa_t001w LIKE LINE OF it_t001w.
+
+  DATA  v_name1 TYPE t001w-name1.
+
+WRITE : / 'MATERIAL NUMBER',
+        40 'PLANT NUMBER',
+        80 'PLANT NAME'.
+
+
+
+
+
+  SELECT  matnr werks FROM marc INTO TABLE it_marc WHERE matnr EQ p_matnr.
+    SELECT  name1 werks FROM t001w INTO TABLE  it_t001w FOR ALL ENTRIES IN it_marc WHERE werks EQ it_marc-werks.
+    LOOP AT it_marc INTO wa_marc.
+     READ TABLE it_t001w INTO wa_t001w WITH KEY werks = wa_marc-werks.
+
+    write: / wa_marc-matnr,
+             40 wa_marc-werks,
+             80 wa_t001w-name1.
+ ENDLOOP.

@@ -1,0 +1,27 @@
+*&---------------------------------------------------------------------*
+*& Report ZFRST_PROGRAM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZFRST_PROGRAM.
+PARAMETERS p_name TYPE c LENGTH 10.
+write p_name.
+DATA qty TYPE i.
+qty = '11.56'.
+write qty.
+DATA w TYPE F.
+W = '20231010'.
+write w.
+DATA s TYPE X.
+s = '124500'.
+WRITE s.
+DATA D TYPE  p DECIMALS 3.
+D ='10.45'.
+write D.
+
+
+
+
+DATA V TYPE Z4_TYPE.
+V = 'PRAJWAL'.
+write v.

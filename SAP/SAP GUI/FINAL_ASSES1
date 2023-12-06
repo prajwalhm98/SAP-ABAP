@@ -1,0 +1,59 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_FINAL_ASSESMENT1
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_FINAL_ASSESMENT1.
+
+types : begin of ty_marc,
+  matnr type marc-matnr,
+  werks type marc-werks,
+  end of ty_marc.
+
+  data : it_marc type table of ty_marc.
+
+
+ select matnr werks from marc into table it_marc.
+ cl_salv_table=>factory(
+*       EXPORTING
+*         list_display   = if_salv_c_bool_sap=>false " ALV Displayed in List Mode
+*         r_container    =                           " Abstract Container for GUI Controls
+*         container_name =
+       IMPORTING
+         r_salv_table   =   data(o_alv)                       " Basis Class Simple ALV Tables
+       CHANGING
+         t_table        = it_marc
+     ).
+     o_alv->display( ).
+
+*     CATCH cx_salv_msg. " ALV: General Error Class with Message
+
+class lcl_material DEFINITION.
+  public section.
+  methods raise_double_click for event double_click of cl_salv_events_table importing row .
+  endclass.
+
+class lcl_material IMPLEMENTATION.
+  method raise_double_click.
+
+    data o_event type ref to lcl_material .
+     select matnr werks from marc into table it_marc .
+create object o_event.
+   cl_salv_table=>factory(
+*       EXPORTING
+*         list_display   = if_salv_c_bool_sap=>false " ALV Displayed in List Mode
+*         r_container    =                           " Abstract Container for GUI Controls
+*         container_name =
+       IMPORTING
+         r_salv_table   =   data(o_alv1)                       " Basis Class Simple ALV Tables
+       CHANGING
+         t_table        = it_marc
+     ).
+   data(o_event_class)  = o_alv->get_event( ).
+
+   set handler o_event->raise_double_click for o_event_class.
+     o_alv1->display( ).
+*  lcl_material implementation.
+*  methods raise_double_click.
+     endmethod.
+     endclass.

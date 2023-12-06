@@ -1,0 +1,28 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_OOPS_CONSTRUCTORS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_OOPS_CONSTRUCTORS.
+class lcl_employee DEFINITION.
+  PUBLIC SECTION.
+  DATA emp_id type c length 10.
+  METHODS get_salary EXPORTING ex_sal type i.
+
+  ENDCLASS.
+
+  class lcl_employee IMPLEMENTATION.
+    method get_salary.
+      ENDMETHOD.
+      ENDCLASS.
+
+      DATA o_john TYPE REF TO lcl_employee.
+      DATA v_salary type i.
+      START-OF-SELECTION.
+      CREATE OBJECT o_john.
+
+      o_john->get_salary(
+       IMPORTING
+         ex_sal = v_salary
+      ).
+      write : v_salary.

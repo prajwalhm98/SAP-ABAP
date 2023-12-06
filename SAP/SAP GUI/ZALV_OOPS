@@ -1,0 +1,17 @@
+*&---------------------------------------------------------------------*
+*& Report ZALV_EVENTS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZALV_EVENTS.
+DATA it_makt TYPE TABLE OF makt.
+
+SELECT * FROM makt into TABLE it_makt.
+  cl_salv_table=>factory(
+    IMPORTING
+      r_salv_table   =    DATA(o_alv)
+    CHANGING
+      t_table        = it_makt
+  ).
+
+  o_alv->display( ).

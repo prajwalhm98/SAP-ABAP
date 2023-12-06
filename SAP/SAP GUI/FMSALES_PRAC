@@ -1,0 +1,17 @@
+*&---------------------------------------------------------------------*
+*& Report ZPPRAC_FMSALES
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPPRAC_FMSALES.
+
+data p_vbeln type vbak-vbeln.
+SELECT-options x_vbeln for p_vbeln.
+CALL FUNCTION 'ZP1_MODULE_PRAC'
+  EXPORTING
+    im_vbeln           = x_vbeln[]
+
+          .
+          AT LINE-SELECTION.
+CALL FUNCTION 'ZP2_MODULE_PRAC'
+          .

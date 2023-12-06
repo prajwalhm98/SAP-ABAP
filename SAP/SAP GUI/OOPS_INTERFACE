@@ -1,0 +1,15 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_OOP_INTERFACE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_OOP_INTERFACE.
+
+DATA : o_bus type REF TO zcl_p_bus,
+      o_truck TYPE REF TO zcl_p_truck,
+      o_account TYPE REF TO zcl_p_account.
+
+create object:  o_bus, o_truck, o_account.
+
+o_account->calculatefuelcost( ovechile = o_bus ).
+o_account->calculatefuelcost( ovechile = o_truck ).

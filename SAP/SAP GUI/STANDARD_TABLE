@@ -1,0 +1,43 @@
+*&---------------------------------------------------------------------*
+*& Report ZSTANDARD_TABLE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZSTANDARD_TABLE.
+
+TYPES : BEGIN OF ty_makt,
+       matnr TYPE makt-matnr,
+       spras TYPE makt-spras,
+       maktx TYPE makt-maktx,
+  END OF ty_makt.
+
+  DATA : it_makt TYPE Standard TABLE OF ty_makt,
+        wa_makt LIKE LINE OF it_makt.
+
+  wa_makt-matnr = '100'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx = 'pen'.
+  APPEND wa_makt TO it_makt.
+
+   wa_makt-matnr = '200'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx = 'pen'.
+  APPEND wa_makt TO  it_makt.
+
+   wa_makt-matnr = '100'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx = 'pen'.
+  APPEND wa_makt TO it_makt.
+
+   wa_makt-matnr = '200'.
+  wa_makt-spras = 'D'.
+  wa_makt-maktx = 'pen'.
+ APPEND wa_makt TO it_makt.
+
+sort it_makt by matnr spras.
+ READ TABLE it_makt INTO wa_makt WITH KEY matnr = '100' spras = 'E'.
+ LOOP AT IT_MAKT INTO WA_MAKT.
+ write : / wa_makt-matnr,
+ wa_makt-spras,
+ wa_makt-maktx.
+ ENDLOOP.

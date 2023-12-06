@@ -1,0 +1,37 @@
+*&---------------------------------------------------------------------*
+*& Report ZSORTED_TABLE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZSORTED_TABLE.
+
+TYPES : BEGIN OF ty_makt,
+       matnr TYPE makt-matnr,
+       spras TYPE makt-spras,
+       maktx TYPE makt-maktx,
+  END OF ty_makt.
+
+  DATA : it_makt TYPE SORTED TABLE OF ty_makt WITH UNIQUE KEY matnr spras,
+        wa_makt LIKE LINE OF it_makt.
+
+  wa_makt-matnr = '100'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx = 'pen'.
+  INSERT wa_makt INTO TABLE it_makt.
+
+   wa_makt-matnr = '300'.
+  wa_makt-spras = 'E'.
+  wa_makt-maktx = 'pencil'.
+  INSERT wa_makt INTO TABLE it_makt.
+
+   wa_makt-matnr = '200'.
+  wa_makt-spras = 'D'.
+  wa_makt-maktx = 'pen'.
+ INSERT wa_makt INTO TABLE it_makt.
+
+ READ TABLE it_makt INTO wa_makt WITH KEY matnr = '300' spras = 'E'.
+ loop at it_makt into wa_makt.
+ write : / wa_makt-matnr,
+ wa_makt-spras,
+ wa_makt-maktx.
+ endloop.

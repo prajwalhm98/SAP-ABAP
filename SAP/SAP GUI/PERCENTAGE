@@ -1,0 +1,32 @@
+*&---------------------------------------------------------------------*
+*& Report ZPERCENTAGE_PROGRAM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPERCENTAGE_PROGRAM.
+
+PARAMETERS: p_amount LENGTH 10,
+            p_pecnt LENGTH 10,
+            p_days LENGTH 10,
+            p_sd AS CHECKBOX.
+
+DATA: simple_interest TYPE p DECIMALS 2,
+      compound_interest TYPE p DECIMALS 2,
+      total_value TYPE p DECIMALS 2,
+      years TYPE p DECIMALS 2.
+
+  years = p_days / 365.
+  simple_interest = ( p_amount * p_pecnt * years ) .
+  compound_interest = p_amount * ( ( 1 + p_pecnt / 100 ) ** years   ).
+
+  IF p_sd = abap_true.
+    total_value = p_amount + simple_interest.
+    WRITE: / 'Initial Amount:', p_amount,
+         / 'Number of Days:', p_days,
+     / 'Total Amount Paid :', total_value.
+  ELSE.
+    total_value = p_amount + compound_interest.
+    WRITE: / 'Initial Amount:', p_amount,
+         / 'Number of Days:', p_days,
+         / 'Total Amount Paid :', total_value.
+  ENDIF.

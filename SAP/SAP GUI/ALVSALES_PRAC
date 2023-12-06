@@ -1,0 +1,255 @@
+*&---------------------------------------------------------------------*
+*& Report ZPPRAC_ALVSALES
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPPRAC_ALVSALES.
+
+DATA : it_vbak     TYPE z1_vbak,
+       wa_vbak     LIKE LINE OF it_vbak,
+       it_kna1     TYPE z1_kna1,
+       wa_kna1     LIKE LINE OF it_kna1,
+       it_vbap     TYPE z1_vbap,
+       wa_vbap     LIKE LINE OF it_vbap,
+       it_t006a    TYPE z1_t006a,
+       wa_t006a    LIKE LINE OF it_t006a,
+        it_header   TYPE z_header,
+       wa_header   LIKE LINE OF it_header,
+       it_item     TYPE z_item,
+       wa_item     LIKE LINE OF it_item,
+       it_fcat type slis_t_fieldcat_alv,
+       it_fieldcat type slis_t_fieldcat_alv ,
+       v_vbeln type vbak-vbeln.
+
+DATA fs_layout type slis_layout_alv.
+fs_layout-zebra ='x'.
+
+
+
+
+
+SELECT-OPTIONS s_num for wa_vbak-vbeln.
+
+PERFORM get_data.
+perform display_header.
+
+form get_data.
+select vbeln audat netwr kunnr from vbak into table it_vbak where vbeln in s_num.
+  select kunnr name1 from kna1 into table it_kna1 for all entries in it_vbak where kunnr eq it_vbak-kunnr.
+    loop at it_vbak into wa_vbak.
+      read table it_kna1 into wa_kna1 with key kunnr = wa_vbak-kunnr.
+      MOVE-CORRESPONDING wa_vbak to wa_header.
+      MOVE-CORRESPONDING wa_kna1 to wa_header.
+      APPEND wa_header to it_header.
+      clear wa_header.
+      endloop.
+endform.
+
+form display_header.
+  data lw_fcat like line of it_fcat.
+lw_fcat-col_pos = 1.
+    lw_fcat-fieldname = 'vbeln'.
+    lw_fcat-tabname = 'it_header'.
+    lw_fcat-seltext_m = 'document number'.
+    lw_fcat-outputlen = 20.
+    append lw_fcat to it_fcat.
+    lw_fcat-col_pos = 2.
+    lw_fcat-fieldname = 'audat'.
+    lw_fcat-tabname = 'it_header'.
+    lw_fcat-seltext_m = 'DATE'.
+    lw_fcat-outputlen = 20.
+    append lw_fcat to it_fcat.
+    lw_fcat-col_pos = 3.
+    lw_fcat-fieldname = 'NETWR'.
+    lw_fcat-tabname = 'it_header'.
+    lw_fcat-seltext_m = 'NET VALUE'.
+    lw_fcat-outputlen = 20.
+    append lw_fcat to it_fcat.
+    lw_fcat-col_pos = 4.
+    lw_fcat-fieldname = 'NAME1'.
+    lw_fcat-tabname = 'it_header'.
+    lw_fcat-seltext_m = 'SOLD TO PARTY'.
+    lw_fcat-outputlen = 20.
+    append lw_fcat to it_fcat.
+       CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+        EXPORTING
+*          I_INTERFACE_CHECK                 = ' '
+*          I_BYPASSING_BUFFER                = ' '
+*          I_BUFFER_ACTIVE                   = ' '
+          I_CALLBACK_PROGRAM                = 'ZPPRAC_ALVSALES'
+*          I_CALLBACK_PF_STATUS_SET          = ' '
+          I_CALLBACK_USER_COMMAND           = 'USER_COMMAND'
+*          I_CALLBACK_TOP_OF_PAGE            = ' HEADER '
+*          I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+*          I_CALLBACK_HTML_END_OF_LIST       = ' '
+*          I_STRUCTURE_NAME                  =
+*          I_BACKGROUND_ID                   = ' '
+*          I_GRID_TITLE                      =
+*          I_GRID_SETTINGS                   =
+          IS_LAYOUT                         = fs_layout
+          IT_FIELDCAT                       = it_fcat
+*          IT_EXCLUDING                      =
+*          IT_SPECIAL_GROUPS                 =
+*          IT_SORT                           =
+*          IT_FILTER                         =
+*          IS_SEL_HIDE                       =
+*          I_DEFAULT                         = 'X'
+*          I_SAVE                            = ' '
+*          IS_VARIANT                        =
+*          IT_EVENTS                         =
+*          IT_EVENT_EXIT                     =
+*          IS_PRINT                          =
+*          IS_REPREP_ID                      =
+*          I_SCREEN_START_COLUMN             = 0
+*          I_SCREEN_START_LINE               = 0
+*          I_SCREEN_END_COLUMN               = 0
+*          I_SCREEN_END_LINE                 = 0
+*          I_HTML_HEIGHT_TOP                 = 0
+*          I_HTML_HEIGHT_END                 = 0
+*          IT_ALV_GRAPHICS                   =
+*          IT_HYPERLINK                      =
+*          IT_ADD_FIELDCAT                   =
+*          IT_EXCEPT_QINFO                   =
+*          IR_SALV_FULLSCREEN_ADAPTER        =
+*          O_PREVIOUS_SRAL_HANDLER           =
+*        IMPORTING
+*          E_EXIT_CAUSED_BY_CALLER           =
+*          ES_EXIT_CAUSED_BY_USER            =
+         TABLES
+           t_outtab                          = it_header
+        EXCEPTIONS
+          PROGRAM_ERROR                     = 1
+          OTHERS                            = 2
+                 .
+       endform.
+     form  user_command using r_ucomm like sy-ucomm
+            rs_selfield type slis_selfield.
+       if r_ucomm eq '&IC1' AND  rs_selfield-fieldname eq 'vbeln'.
+        clear it_item.
+         SELECT vbeln posnr pstyv arktx kwmeng zieme netwr FROM vbap INTO TABLE it_vbap WHERE vbeln EQ rs_selfield-value.
+    SELECT msehi msehl FROM t006a INTO TABLE it_t006a FOR ALL ENTRIES IN it_vbap WHERE msehi EQ it_vbap-zieme AND spras EQ sy-langu.
+    LOOP AT it_vbap INTO wa_vbap.
+      READ TABLE it_t006a INTO wa_t006a WITH KEY msehi = wa_vbap-zieme.
+      MOVE-CORRESPONDING wa_vbap TO wa_item.
+      MOVE-CORRESPONDING wa_t006a TO wa_item.
+      APPEND wa_item TO it_item.
+      CLEAR wa_item.
+    ENDLOOP.
+    clear it_fieldcat.
+    DATA lw_fieldcat like line of it_fieldcat.
+    lw_fieldcat-col_pos = 1.
+    lw_fieldcat-fieldname = 'POSNR'.
+    lw_fieldcat-tabname = 'IT_ITEM'.
+    lw_fieldcat-seltext_m = 'ITEM NUMBER'.
+    lw_fieldcat-outputlen = 20.
+    append lw_fieldcat to it_fieldcat.
+    lw_fieldcat-col_pos = 2.
+    lw_fieldcat-fieldname = 'PSTYV'.
+    lw_fieldcat-tabname = 'IT_ITEM'.
+    lw_fieldcat-seltext_m = 'MATERIAL TYPE'.
+    lw_fieldcat-outputlen = 20.
+    append lw_fieldcat to it_fieldcat.
+    lw_fieldcat-col_pos = 3.
+    lw_fieldcat-fieldname = 'ARKTX'.
+    lw_fieldcat-tabname = 'IT_ITEM'.
+    lw_fieldcat-seltext_m = 'ITEM DESC'.
+    lw_fieldcat-outputlen = 20.
+    append lw_fieldcat to it_fieldcat.
+    lw_fieldcat-col_pos = 4.
+    lw_fieldcat-fieldname = 'KWMENG'.
+    lw_fieldcat-tabname = 'IT_ITEM'.
+    lw_fieldcat-seltext_m = 'ORDER QTY'.
+    lw_fieldcat-outputlen = 20.
+    append lw_fieldcat to it_fieldcat.
+    lw_fieldcat-col_pos = 5.
+    lw_fieldcat-fieldname = 'MSEHL'.
+    lw_fieldcat-tabname = 'IT_ITEM'.
+    lw_fieldcat-seltext_m = 'U0M'.
+    lw_fieldcat-outputlen = 20.
+    append lw_fieldcat to it_fieldcat.
+    lw_fieldcat-col_pos = 6.
+    lw_fieldcat-fieldname = 'NETWR'.
+    lw_fieldcat-tabname = 'IT_ITEM'.
+    lw_fieldcat-seltext_m = 'NET VALUE'.
+    lw_fieldcat-outputlen = 20.
+    append lw_fieldcat to it_fieldcat.
+    CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+    EXPORTING
+*       I_INTERFACE_CHECK                 = ' '
+*       I_BYPASSING_BUFFER                = ' '
+*       I_BUFFER_ACTIVE                   = ' '
+       I_CALLBACK_PROGRAM                = 'ZPPRAC_ALVSALES'
+*       I_CALLBACK_PF_STATUS_SET          = ' '
+*       I_CALLBACK_USER_COMMAND           = 'USER_COMMAND'
+      I_CALLBACK_TOP_OF_PAGE            = 'HEADER'
+*       I_CALLBACK_HTML_TOP_OF_PAGE       = ' '
+*       I_CALLBACK_HTML_END_OF_LIST       = ' '
+*       I_STRUCTURE_NAME                  =
+*       I_BACKGROUND_ID                   = ' '
+*       I_GRID_TITLE                      =
+*       I_GRID_SETTINGS                   =
+      IS_LAYOUT                         = fs_layout
+       IT_FIELDCAT                       = it_fieldcat
+*       IT_EXCLUDING                      =
+*       IT_SPECIAL_GROUPS                 =
+*       IT_SORT                           =
+*       IT_FILTER                         =
+*       IS_SEL_HIDE                       =
+*       I_DEFAULT                         = 'X'
+*       I_SAVE                            = ' '
+*       IS_VARIANT                        =
+*     IT_EVENTS                         =
+*       IT_EVENT_EXIT                     =
+*       IS_PRINT                          =
+*       IS_REPREP_ID                      =
+*       I_SCREEN_START_COLUMN             = 0
+*       I_SCREEN_START_LINE               = 0
+*       I_SCREEN_END_COLUMN               = 0
+*       I_SCREEN_END_LINE                 = 0
+*       I_HTML_HEIGHT_TOP                 = 0
+*       I_HTML_HEIGHT_END                 = 0
+*       IT_ALV_GRAPHICS                   =
+*       IT_HYPERLINK                      =
+*       IT_ADD_FIELDCAT                   =
+*       IT_EXCEPT_QINFO                   =
+*       IR_SALV_FULLSCREEN_ADAPTER        =
+*       O_PREVIOUS_SRAL_HANDLER           =
+*     IMPORTING
+*       E_EXIT_CAUSED_BY_CALLER           =
+*       ES_EXIT_CAUSED_BY_USER            =
+      TABLES
+        t_outtab                          = it_item
+     EXCEPTIONS
+       PROGRAM_ERROR                     = 1
+       OTHERS                            = 2
+              .
+
+         endif.
+         if r_ucomm eq '&ic1' AND rs_selfield-fieldname eq 'kunnr'.
+
+           DATA lv_Kunnr type kna1-kunnr.
+
+           set parameter id 'kun' field lv_kunnr.
+           CALL TRANSACTION 'XD03'.
+           ENDIF.
+
+
+endform.
+DATA: I_COMMENT TYPE SLIS_T_LISTHEADER,
+
+WA_COMMENT TYPE SLIS_LISTHEADER.
+FORM HEADER.
+
+wa_comment-typ ='H'.
+wa_comment-info = 'welcome to header'.
+append wa_comment to i_comment.
+clear wa_comment.
+CALL FUNCTION 'REUSE_ALV_COMMENTARY_WRITE'
+  EXPORTING
+    it_list_commentary       = i_comment
+*   I_LOGO                   =
+*   I_END_OF_LIST_GRID       =
+*   I_ALV_FORM               =
+          .
+
+ENDFORM.

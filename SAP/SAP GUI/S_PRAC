@@ -1,0 +1,50 @@
+*&---------------------------------------------------------------------*
+*& Report ZS_PRAC
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZS_PRAC.
+
+*TYPES : BEGIN OF ty_vbak,
+*      vbeln type vbak-vbeln,
+*     audat type vbak-audat,
+*     netwr type vbak-netwr,
+*    kunnr type vbak-kunnr,
+*  end of ty_vbak.
+*
+*  types : begin of ty_kna1,
+*         kunnr type kna1-kunnr,
+*         name1 type kna1-name1,
+*    end of ty_kna1.
+*    types : begin
+
+
+  DATA : st_vbak type zs1_vbak,
+        st_kna1 type zs1_kna1,
+        st_vbap type zs1_vbap,
+        st_t006a type zs1_t006a.
+
+  PARAMETERS p_vbeln type  vbak-vbeln.
+
+
+select  vbeln audat netwr kunnr from vbak into st_vbak where vbeln eq p_vbeln.
+    select single  kunnr name1 from kna1 into st_kna1 where kunnr eq st_vbak-kunnr.
+
+write : / st_vbak-vbeln,
+              st_vbak-audat,
+              st_vbak-netwr,
+              st_kna1-name1.
+
+endselect.
+      select vbeln posnr pstyv arktx kwmeng zieme netwr from vbap into st_vbap where vbeln eq p_vbeln.
+        select single msehi msehl from t006a into st_t006a where msehi eq st_vbap-zieme.
+
+         write : /     st_vbap-posnr,
+              st_vbap-pstyv,
+              st_vbap-arktx,
+              st_vbap-kwmeng,
+              st_vbap-netwr,
+              st_t006a-msehi.
+*MOVE-CORRESPONDING st_t006a to st_vbap.
+*APPEND st_t006a to st_vbap.
+endselect.

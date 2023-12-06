@@ -1,0 +1,83 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_FINAL_ASSESMENT2
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_FINAL_ASSESMENT2.
+
+types : begin of ty_dep,
+   employeeid type c length 10,
+  employeename type c  length 10,
+  dob type d,
+  department type c length 10,
+  location type c length 10,
+  end of ty_dep.
+
+data : it_dep type standard table of ty_dep,
+      wa_dep like line of it_dep.
+
+
+
+  PARAMETERS p_file TYPE IBIPPARMS-PATH.
+  AT SELECTION-SCREEN ON VALUE-REQUEST FOR P_FILE.
+CALL FUNCTION 'F4_FILENAME'
+ EXPORTING
+   PROGRAM_NAME        = SYST-CPROG
+   DYNPRO_NUMBER       = SYST-DYNNR
+   FIELD_NAME          = ' p_file'
+ IMPORTING
+   FILE_NAME           = p_file .
+
+
+  START-OF-SELECTION.
+
+   DATA v_file TYPE String.
+  v_file = p_file.
+  CALL FUNCTION 'GUI_UPLOAD'
+
+    EXPORTING
+      filename                      = v_file
+      FILETYPE                      = 'ASC'
+      HAS_FIELD_SEPARATOR           = ' '
+*     HEADER_LENGTH                 = 0
+*     READ_BY_LINE                  = 'X'
+*     DAT_MODE                      = ' '
+*     CODEPAGE                      = ' '
+*     IGNORE_CERR                   = ABAP_TRUE
+*     REPLACEMENT                   = '#'
+*     CHECK_BOM                     = ' '
+*     VIRUS_SCAN_PROFILE            =
+*     NO_AUTH_CHECK                 = ' '
+*   IMPORTING
+*     FILELENGTH                    =
+*     HEADER                        =
+    tables
+      data_tab                      = it_dep
+*   CHANGING
+*     ISSCANPERFORMED               = ' '
+*   EXCEPTIONS
+*     FILE_OPEN_ERROR               = 1
+*     FILE_READ_ERROR               = 2
+*     NO_BATCH                      = 3
+*     GUI_REFUSE_FILETRANSFER       = 4
+*     INVALID_TYPE                  = 5
+*     NO_AUTHORITY                  = 6
+*     UNKNOWN_ERROR                 = 7
+*     BAD_DATA_FORMAT               = 8
+*     HEADER_NOT_ALLOWED            = 9
+*     SEPARATOR_NOT_ALLOWED         = 10
+*     HEADER_TOO_LONG               = 11
+*     UNKNOWN_DP_ERROR              = 12
+*     ACCESS_DENIED                 = 13
+*     DP_OUT_OF_MEMORY              = 14
+*     DISK_FULL                     = 15
+*     DP_TIMEOUT                    = 16
+*     OTHERS                        = 17
+            .
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+  ENDIF.
+             LOOP AT it_dep INTO wa_dep.
+               WRITE :/
+                wa_dep-employeename, wa_dep-employeeid, wa_dep-dob, wa_dep-department, wa_dep-location.
+  ENDLOOP.

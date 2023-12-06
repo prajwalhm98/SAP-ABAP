@@ -1,0 +1,13 @@
+*&---------------------------------------------------------------------*
+*& Report ZD_PROCEDURECALL
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZD_PROCEDURECALL.
+DATA v_date type sy-datum.
+v_date = sy-datum.
+write v_date.
+AT LINE-SELECTION.
+  EXPORT v_date TO MEMORY ID 'PRAJWAL'.
+  SUBMIT ZDEMO_PROCEDURE AND RETURN.
+  write 'end'.

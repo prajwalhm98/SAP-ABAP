@@ -1,0 +1,49 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_PROCESSING
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_PROCESSING.
+DATA v_maktx TYPE maktx.
+data date type d.
+
+PARAMETERS p_matnr TYPE matnr DEFAULT 'MN100'.
+PARAMETERS p_date TYPE sy-datum.
+*PARAMETERS p_time TYPE T.
+PARAMETERS p_setl AS CHECKBOX.
+
+ date = sy-datum.
+ write date.
+INITIALIZATION.
+p_matnr = 'MN200'.
+
+START-OF-SELECTION.
+
+ DATA v_name TYPE c LENGTH 10.
+  SELECT SINGLE maktx FROM makt INTO v_maktx WHERE matnr EQ p_matnr.
+  PERFORM show_output.
+  CALL SELECTION-SCREEN 1000.
+AT LINE-SELECTION.
+  WRITE 'Secondary List'.
+FORM show_output.
+
+  v_name = 'PRAJWAL'.
+  WRITE  v_maktx.
+ENDFORM.
+TOP-OF-PAGE.
+  write : 'header'.
+  END-OF-PAGE.
+  write : 'footer'.
+FORM display.
+    v_name = 'Kiran'.
+ENDFORM.
+
+AT SELECTION-SCREEN OUTPUT.
+
+  write : date.
+*  LOOP AT SCREEN.
+*    IF screen-name = 'P_SETL'.
+*      screen-input = 0.
+*      MODIFY SCREEN.
+*    ENDIF.
+*  ENDLOOP.

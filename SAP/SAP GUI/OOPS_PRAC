@@ -1,0 +1,33 @@
+*&---------------------------------------------------------------------*
+*& Report ZOOPS_ALVPRAC
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZOOPS_ALVPRAC.
+
+types : begin of ty_marc,
+  matnr type marc-matnr,
+  werks type marc-werks,
+  end of ty_marc.
+
+  types : begin of ty_t001w,
+    werks type t001w-werks,
+  name1 type t001w-name1,
+    end of ty_t001w.
+data : it_marc type table of ty_marc,
+      it_t001w type table of ty_t001w.
+*data o_matnr type ref to cl_salv_table.
+select matnr werks from marc into table it_marc.
+*  select werks name1 from t001w into table it_t001w for all entries in it_marc where werks eq it_marc-werks.
+  cl_salv_table=>factory(
+*    EXPORTING
+*      list_display   = if_salv_c_bool_sap=>false " ALV Displayed in List Mode
+*      r_container    =                           " Abstract Container for GUI Controls
+*      container_name =
+    IMPORTING
+      r_salv_table   =  data(o_matnr)                        " Basis Class Simple ALV Tables
+    CHANGING
+      t_table        =  it_marc
+  ).
+  o_matnr->display( ).
+*  CATCH cx_salv_msg. " ALV: General Error Class with Message

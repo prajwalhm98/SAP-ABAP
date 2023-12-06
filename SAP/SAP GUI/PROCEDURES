@@ -1,0 +1,46 @@
+*&---------------------------------------------------------------------*
+*& Report ZP1_PROCEDURES
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP1_PROCEDURES.
+
+DATA : v_matnr TYPE makt-matnr,
+      v_spras TYPE makt-spras,
+      v_maktx TYPE makt-maktx.
+
+v_matnr = '000000000000000056'.
+v_spras ='E'.
+*v_maktx = 'sdfg'.
+perform d.
+PERFORM get_data USING v_matnr v_spras CHANGING v_maktx.
+write : v_maktx,
+V_SPRAS,
+V_MATNR.
+*&---------------------------------------------------------------------*
+*& Form get_data
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> V_MATNR
+*&      --> V_SPRAS
+*&      <-- V_MAKTX
+*&---------------------------------------------------------------------*
+FORM get_data USING VALUE(p_v_matnr) TYPE makt-matnr
+                VALUE(p_v_spras) TYPE makt-spras
+              CHANGING VALUE(p_v_maktx) TYPE makt-maktx.
+  select single maktx from makt into p_v_maktx where matnr eq p_v_matnr and spras eq p_v_spras.
+    p_v_matnr = '000000000000000054'.
+    P_V_MAKTX = 'SAP'.
+ENDFORM.
+*&---------------------------------------------------------------------*
+*& Form d
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM d .
+
+ENDFORM.

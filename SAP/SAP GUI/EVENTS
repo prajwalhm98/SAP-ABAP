@@ -1,0 +1,16 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_EVENTS
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_EVENTS.
+
+DATA : o_emp type REF TO zcl_p_event.
+DATA : o_handler type REF TO zcl_p_event1.
+
+create object o_emp.
+create OBJECT o_handler.
+START-OF-SELECTION.
+
+SET HANDLER o_handler->catch_double_click FOR o_emp.
+o_emp->double_click( ).

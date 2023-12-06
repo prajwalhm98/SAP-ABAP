@@ -1,0 +1,26 @@
+*&---------------------------------------------------------------------*
+*& Report ZREPORT_PROGRAM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZREPORT_PROGRAM.
+
+TYPES : BEGIN OF ty_ztable_ust,
+  empid TYPE ztable_ust-empid,
+  name TYPE ztable_ust-name,
+  salary TYPE ztable_ust-salary,
+  cuky TYPE ztable_ust-cuky,
+  department_code TYPE ztable_ust-department_code,
+  END OF ty_ztable_ust.
+
+  DATA st_ztable_ust TYPE ty_ztable_ust.
+
+  PARAMETERS p_empid TYPE ztable_ust-empid.
+
+  SELECT SINGLE empid name salary cuky department_code  FROM ztable_ust INTO st_ztable_ust WHERE empid EQ p_empid.
+
+    write : st_ztable_ust-empid,
+            st_ztable_ust-name,
+            st_ztable_ust-salary,
+            st_ztable_ust-cuky,
+            st_ztable_ust-department_code.

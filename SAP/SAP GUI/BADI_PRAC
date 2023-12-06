@@ -1,0 +1,16 @@
+*&---------------------------------------------------------------------*
+*& Report ZPRAC_BADI
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPRAC_BADI.
+
+data o_badi type ref to zp3_def.
+
+parameters v_value type i.
+
+get badi o_badi.
+call badi o_badi->cal_tax
+  EXPORTING
+    v_val = v_value
+  .

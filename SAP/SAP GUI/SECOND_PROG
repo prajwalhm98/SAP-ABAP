@@ -1,0 +1,14 @@
+*&---------------------------------------------------------------------*
+*& Report ZSECOND_PROGRAM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZSECOND_PROGRAM.
+
+TYPES ty_names TYPE c LENGTH 20.
+
+DATA : v_name TYPE Z4_type,
+      v_f_name TYPE Z4_type,
+      v_m_name TYPE Z4_type.
+
+write v_name.

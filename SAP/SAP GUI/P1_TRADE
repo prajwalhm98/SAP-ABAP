@@ -1,0 +1,135 @@
+*&---------------------------------------------------------------------*
+*& Report ZP1_TRADE
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP1_TRADE.
+
+TYPES : BEGIN OF ty_file,
+          date  TYPE D,
+          price TYPE p DECIMALS 2,
+          open  TYPE p DECIMALS 2,
+          high  TYPE p DECIMALS 2,
+          low   TYPE p DECIMALS 2,
+        END OF ty_file.
+
+DATA: it_trade TYPE TABLE OF ty_file,
+      wa_trade LIKE LINE OF it_trade,
+      prev_day TYPE ty_file-price,
+      term TYPE string,
+      invest_amnt TYPE p DECIMALS 2,
+      withdrawal TYPE p DECIMALS 2,
+      profit_low TYPE p DECIMALS 2,
+      profit_high TYPE p DECIMALS 2,
+      complete_trade type i value 0,
+      p_long type i,
+      p_short type i,
+      total_profit_high type p DECIMALS 2,
+      total_profit_low type P DECIMALS 2,
+      qty type p DECIMALS 2 value 0,
+      profit_per_share type p decimals 2.
+
+ DATA it_file type TRUXS_T_TEXT_DATA.
+
+PARAMETERS : p_file TYPE localfile,
+            p_iamt TYPE p DECIMALS 2.
+
+
+AT SELECTION-SCREEN ON VALUE-REQUEST FOR p_file.
+  CALL FUNCTION 'F4_FILENAME'
+   EXPORTING
+     PROGRAM_NAME        = SYST-CPROG
+     DYNPRO_NUMBER       = SYST-DYNNR
+     FIELD_NAME          = ' P_FILE'
+   IMPORTING
+     FILE_NAME           = P_FILE
+            .
+
+
+
+* CALL FUNCTION 'TEXT_CONVERT_XLS_TO_SAP'
+*   EXPORTING
+**    I_FIELD_SEPERATOR          =
+*    I_LINE_HEADER              = ABAP_TRUE
+*     i_tab_raw_data             = it_file
+*     i_filename                 = p_file
+**    I_STEP                     = 1
+*   TABLES
+*     i_tab_converted_data       = it_trade
+*  EXCEPTIONS
+*    CONVERSION_FAILED          = 1
+*    OTHERS                     = 2
+*           .
+* IF sy-subrc <> 0.
+** Implement suitable error handling here
+* ENDIF.
+START-OF-SELECTION.
+*DATA v_file TYPE string.
+*  v_file = p_file.
+
+CALL FUNCTION 'TEXT_CONVERT_XLS_TO_SAP'
+  EXPORTING
+*   I_FIELD_SEPERATOR          = ';'
+   I_LINE_HEADER              = ABAP_TRUE
+    i_tab_raw_data             = it_file
+   I_FILENAME                 = p_file
+  tables
+    i_tab_converted_data       = it_trade
+ EXCEPTIONS
+   CONVERSION_FAILED          = 1
+   OTHERS                     = 2
+          .
+IF sy-subrc <> 0.
+* Implement suitable error handling here
+ENDIF.
+
+invest_amnt = p_iamt.
+
+  LOOP AT it_trade INTO wa_trade.
+    IF sy-tabix = 1.
+      prev_day = wa_trade-price.
+      CONTINUE.
+    ENDiF.
+
+complete_trade = complete_trade + 1.
+
+  IF wa_trade-open > prev_day.
+   term = 'Long Term'.
+   p_long = p_long + 1.
+    profit_high = ( wa_trade-high - wa_trade-open ) / wa_trade-open  * 100 .
+*    total_profit_high = profit_high * qty.
+    IF profit_high >= 2.
+      invest_amnt = invest_amnt +  total_profit_high.
+*    ELSE.
+*      invest_amnt = invest_amnt +  total_profit_high.
+   ENDIF.
+ elseIF wa_trade-open < prev_day.
+    term = 'Short Term'.
+    p_short = p_short + 1.
+    profit_low = ( wa_trade-price - wa_trade-low ) / wa_trade-low  * 100 .
+
+     IF profit_low >= 2.
+      invest_amnt = invest_amnt +  total_profit_low.
+*   ELSE.
+*    invest_amnt = invest_amnt +   total_profit_low .
+    ENDIF.
+  ENDIF.
+
+total_profit_low = profit_low * qty.
+total_profit_high = profit_high * qty.
+qty = invest_amnt / wa_trade-open.
+prev_day = wa_trade-open.
+endloop.
+
+
+
+  WRITE : / 'QUANTITY:', qty,
+/ 'TOTAL AMOUNT:', INVEST_AMNT,
+          / 'TERM:', term,
+          / 'COMPLETE TRADE:', complete_trade,
+          / 'long terms:', p_long,
+          / 'short terms:', p_short,
+          / 'profit_high:', profit_high,
+          / 'profit_low:' , profit_low,
+          / 'total profit high:', total_profit_high,
+          / 'total profit low:', total_profit_low.

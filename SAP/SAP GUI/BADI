@@ -1,0 +1,16 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_BADI
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_BADI.
+
+DATA o_badi type ref to zp1_def.
+
+PARAMETERS p_ctry TYPE c length 2.
+
+GET BADI o_badi
+FILTERS
+COUNTRY = p_ctry.
+
+CALL BADI o_badi->claculate_gst.

@@ -1,0 +1,19 @@
+*&---------------------------------------------------------------------*
+*& Report ZPM_SALES
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zpm_sales.
+
+DATA p_vbeln TYPE vbak-vbeln.
+SELECT-OPTIONS x_vbeln FOR p_vbeln.
+
+START-OF-SELECTION.
+  CALL FUNCTION 'ZP1_MODULE'
+   EXPORTING
+      ip_vbeln = x_vbeln[].
+  CALL FUNCTION 'ZP1_HEADER'.
+
+AT LINE-SELECTION.
+  CALL FUNCTION 'ZP2_MODULE'.
+  CALL FUNCTION 'ZP1_ITEM'.

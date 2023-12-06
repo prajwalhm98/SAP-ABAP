@@ -1,0 +1,76 @@
+*&---------------------------------------------------------------------*
+*& Report ZPROCESSING_PRAC
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPROCESSING_PRAC LINE-COUNT 10(1) NO STANDARD PAGE HEADING.
+
+*load-of-PROGRAM.
+
+*write : 'program started'.
+
+
+*INITIALIZATION.
+*WRITE : 'BILLING DOCUMENT'.
+
+
+DATA : it_vbak type z1_vbak,
+      wa_vbak like line of it_vbak,
+      it_kna1 type  z1_kna1,
+      wa_kna1 like line of it_kna1,
+      it_vbap type  z1_vbap,
+      wa_vbap like line of it_vbap,
+      it_t006a type  z1_t006a,
+      wa_t006a like line of it_t006a.
+
+DATA : pre_vbeln type vbap-vbeln.
+
+SELECT-OPTIONS s_vbeln for wa_vbak-vbeln.
+
+
+select vbeln audat netwr kunnr from vbak into table it_vbak where vbeln in s_vbeln.
+  select kunnr name1 from kna1 into table it_kna1 for all ENTRIES IN it_vbak where kunnr eq it_vbak-kunnr.
+
+   loop at it_vbak into wa_vbak.
+
+      READ TABLE it_kna1 into wa_kna1 with key kunnr = wa_vbak-kunnr.
+*      if wa_vbap-vbeln ne pre_vbeln.
+      write : / wa_vbak-vbeln,
+      wa_vbak-audat,
+      wa_vbak-netwr,
+      wa_kna1-name1.
+*      endif.
+      endloop.
+AT LINE-SELECTION.
+DATA : fnam(300) , fval(45).
+DATA v_vbeln type vbap-vbeln.
+GET CURSOR  field fnam value fval.
+fnam = wa_vbap-vbeln.
+CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+  EXPORTING
+    input         = fval
+ IMPORTING
+   OUTPUT        = v_vbeln
+          .
+
+select vbeln posnr pstyv arktx kwmeng zieme netwr from vbap into table it_vbap where vbeln eq v_vbeln.
+  select msehi msehl from t006a into table it_t006a for all ENTRIES IN it_vbap where msehi eq it_vbap-zieme.
+
+loop at it_vbap into wa_vbap.
+        READ TABLE it_t006a into wa_t006a with key msehi = wa_vbap-zieme.
+        write : / wa_vbap-vbeln,
+        wa_vbap-posnr,
+        wa_vbap-pstyv,
+        wa_vbap-arktx,
+        wa_vbap-kwmeng,
+        wa_t006a-msehl,
+        wa_vbap-netwr.
+
+*        pre_vbeln = wa_vbap-vbeln.
+      endloop.
+TOP-OF-PAGE.
+WRITE : 'HEADER:', sy-uzeit , sy-uname.
+.
+
+      END-OF-PAGE.
+WRITE : 'FOOTER'.

@@ -1,0 +1,26 @@
+*&---------------------------------------------------------------------*
+*& Report ZP_MULTILANG
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZP_MULTILANG.
+
+TYPES: BEGIN OF ty_makt,
+         matnr TYPE makt-matnr,
+         spras TYPE makt-spras,
+         maktx TYPE makt-maktx,
+       END OF ty_makt.
+
+DATA : IT_MAKT TYPE TABLE OF TY_MAKT,
+       WA_MAKT LIKE LINE OF IT_MAKT.
+
+PARAMETERS s_num TYPE MAKT-MATNR.
+
+SELECT matnr spras maktx FROM makt INTO TABLE it_makt WHERE matnr EQ S_num .
+
+LOOP AT it_makt into wa_makt.
+    WRITE :/ wa_makt-matnr,
+             wa_makt-spras,
+             wa_makt-maktx.
+
+  ENDLOOP.

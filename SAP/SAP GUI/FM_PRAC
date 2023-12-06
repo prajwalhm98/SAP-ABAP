@@ -1,0 +1,29 @@
+*&---------------------------------------------------------------------*
+*& Report ZPPRAC_FM
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPPRAC_FM.
+
+*types : begin of ty_makt,
+*  matnr type makt-matnr,
+*  spras type makt-spras,
+*  maktx type makt-maktx,
+*  end of ty_makt.
+
+  DATA : it_makt type zt1_makt,
+        wa_makt like line of it_makt.
+*DATA P_MATNR TYPE makt-matnr.
+ select-options s_matnr for wa_makt-matnr.
+  CALL FUNCTION 'ZPPRAC_MODULE'
+    EXPORTING
+      ip_matnr              = s_matnr[]
+   IMPORTING
+     EX_MAKT               = it_makt
+   EXCEPTIONS
+     INVALIDMATERIAL       = 1
+     OTHERS                = 2
+            .
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+  ENDIF.

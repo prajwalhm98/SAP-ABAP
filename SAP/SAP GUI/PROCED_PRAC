@@ -1,0 +1,82 @@
+*&---------------------------------------------------------------------*
+*& Report ZPROCED_PRAC
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZPROCED_PRAC.
+
+DATA : it_vbap type z1_vbap,
+      wa_vbap like line of it_vbap,
+      it_kna1 type z1_kna1,
+      wa_kna1 like line of it_kna1,
+      it_vbak type z1_vbak,
+      wa_vbak like line of it_vbak,
+      it_t006a type z1_t006a,
+      wa_t006a like line of it_t006a,
+      it_header type z_header,
+      wa_header like line of it_header,
+      it_item type z_item,
+      wa_item like line of it_item.
+
+SELECT-OPTIONS s_num for wa_vbak-vbeln.
+
+PERFORM display in program zproced_subprac using s_num[] changing it_header.
+
+*&---------------------------------------------------------------------*
+*& Form display
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> S_NUM
+*&      <-- IT_VBAK
+*&      <-- IT_KNA1
+*&---------------------------------------------------------------------*
+
+
+
+
+AT LINE-SELECTION.
+  DATA : v_vbeln type vbap-vbeln.
+  DATA : fnam(20), fnval(50).
+  GET CURSOR FIELD fnam value fnval.
+  fnam = wa_vbak-vbeln.
+  CALL FUNCTION 'CONVERSION_EXIT_ALPHA_INPUT'
+    EXPORTING
+      input         = fnval
+  IMPORTING
+     OUTPUT        = v_vbeln
+            .
+
+clear it_item.
+
+PERFORM item in program zproced_subprac using v_vbeln changing it_item.
+perform display_header.
+
+*&---------------------------------------------------------------------*
+*& Form ITEM
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*&      --> S_NUM
+*&      <-- IT_VBAP
+*&      <-- IT_T006A
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*& Form display_header
+*&---------------------------------------------------------------------*
+*& text
+*&---------------------------------------------------------------------*
+*& -->  p1        text
+*& <--  p2        text
+*&---------------------------------------------------------------------*
+FORM display_header .
+ loop at it_item into wa_item.
+   write : / wa_item-posnr,
+   wa_item-pstyv,
+   wa_item-arktx,
+   wa_item-kwmeng,
+   wa_item-msehl,
+   wa_item-netwr.
+   endloop.
+
+   ENDFORM.
